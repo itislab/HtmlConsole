@@ -1,0 +1,25 @@
+type project
+title
+    HtmlConsole
+owners
+    Sergey Berezin
+authors 
+    Sergey Berezin
+projectUrl
+    http://github.com/itislab/HtmlConsole
+iconUrl
+    https://raw.githubusercontent.com/itislab/HtmlConsole/master/docs/files/img/logo.png
+licenseUrl
+    http://github.com/itislab/HtmlConsole/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    console HTML F#
+summary
+    Simple cross-platform console supporting HTML markup
+description
+    Simple cross-platform console for rich output from any type of applications. Uses Suave web server and default browser.
+
+
