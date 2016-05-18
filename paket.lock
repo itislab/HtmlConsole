@@ -2,6 +2,8 @@ NUGET
   remote: https://www.nuget.org/api/v2
   specs:
     FSharp.Core (4.0.0.1) - redirects: force
+    Suave (1.1.2)
+      FSharp.Core (>= 3.1.2.5)
 
 GROUP Build
 NUGET
@@ -21,7 +23,7 @@ NUGET
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
     Octokit (0.19)
-      Microsoft.Net.Http  - framework: net10, net11, net20, net30, net35, net40, net40-full
+      Microsoft.Net.Http
     SourceLink.Fake (1.1)
 GITHUB
   remote: fsharp/FAKE

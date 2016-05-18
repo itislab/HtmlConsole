@@ -1,8 +1,10 @@
-// Learn more about F# at http://fsharp.org. See the 'F# Tutorial' project
-// for more guidance on F# programming.
+#I __SOURCE_DIRECTORY__
+#I "./bin/Debug"
+#r "Suave.dll"
 
 #load "Library.fs"
-open HtmlConsole
 
-let num = Library.hello 42
-printfn "%i" num
+HtmlConsole.WriteHtml "<H1>Hello, World</H1>"
+HtmlConsole.WriteHtml "1<2 is true."
+HtmlConsole.Open()
+
