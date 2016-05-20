@@ -48,28 +48,42 @@ let encodeJS (s : string) =
 let private nl = Environment.NewLine
 
 
+let internal documentTemplate =
+    use sr = new IO.StreamReader(Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("console.html"))
+    sr.ReadToEnd()
+
+let rec appendOrReplace (id,elt) list =
+    match list with
+    | [] -> [ id, elt ]
+    | (id',_) :: tail when id' = id -> (id,elt) :: tail
+    | head :: tail -> head :: appendOrReplace (id,elt) tail
+ 
 let internal getUpdates t = 
     let items = contents 
                 |> GS.toSeq t 
-                |> Seq.map (fun (id,t) -> sprintf "{ id: \"%s\"; text: \"%s\" }" (id |> encodeJS) (t |> encodeJS))
+                |> Seq.fold(fun updates (id,t) -> updates |> appendOrReplace (id, sprintf "{ \"id\": \"%s\", \"text\": \"%s\" }" (id |> encodeJS) (t |> encodeJS))) []
+                |> Seq.map snd
                 |> String.concat "," 
     sprintf "[%s]" items
     
 let internal getDocument () = 
-    let body = contents 
-               |> GS.toSeq 0 
-               |> Seq.map (fun (id,t) -> sprintf "<div id=\"%s\">%s</div>" id (System.Net.WebUtility.HtmlEncode(t)))
+    let updates = contents |> GS.toSeq 0 |> Array.ofSeq
+    let divs = updates
+               |> Seq.fold (fun updates (id,t) -> updates |> appendOrReplace (id, sprintf "<div id=\"%s\">%s</div>" id t)) []
+               |> Seq.map snd
                |> String.concat nl
-    sprintf "<!DOCTYPE html>%s<head><title>HTML console</title></head>%s<body>%s</body>" nl nl body
+    documentTemplate
+        .Replace("{{content}}", divs)
+        .Replace("{{timestamp}}", updates.Length.ToString())
 
 /// Sample server that we want to host
 let app = 
     choose 
       [ GET >=> choose 
                 [ path "/" >=> request(fun _ -> OK (getDocument()));
-                  path "/console.js" >=> Writers.setMimeType "text/javascript"
+                  path "/console.js" >=> Writers.setMimeType "application/javascript"
                                      >=> Embedded.sendResource (Reflection.Assembly.GetExecutingAssembly()) "console.js" false
-                  path "/updates" >=> Writers.setMimeType "text/json"
+                  path "/updates" >=> Writers.setMimeType "application/json"
                                   >=> request(fun r -> let t = match r.queryParam "t" with
                                                                | Choice1Of2 t -> match Int32.TryParse t with
                                                                                  | true, t -> t
@@ -106,12 +120,25 @@ let private startSuaveServer() =
         }
         |> Async.Start)
 
+let mutable isOpened = false
+
 let Open() = 
-    async {
-        let! s = startSuaveServer()
-        let binding = s.[0].Value.binding.ToString()
-        System.Diagnostics.Process.Start ("http://" + binding) |> ignore
-    } |> Async.RunSynchronously
+    if not isOpened then 
+        isOpened <- true
+        async {
+            let! s = startSuaveServer()
+            let binding = s.[0].Value.binding.ToString()
+            System.Diagnostics.Process.Start ("http://" + binding) |> ignore
+        } |> Async.RunSynchronously
 
 let WriteHtml html = 
+    Open()
     contents <- GS.add (Guid.NewGuid().ToString(), html) contents
+
+let WriteHtmlId id html = 
+    Open()
+    contents <- GS.add (id, html) contents
+
+let Save (path : string) =
+    use sw = new IO.StreamWriter(path)
+    sw.Write(getDocument())

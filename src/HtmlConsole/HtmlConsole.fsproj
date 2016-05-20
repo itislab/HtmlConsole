@@ -65,6 +65,7 @@
     <None Include="paket.template" />
     <Content Include="App.config" />
     <EmbeddedResource Include="console.js" />
+    <EmbeddedResource Include="console.html" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

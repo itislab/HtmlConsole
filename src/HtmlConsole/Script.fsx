@@ -1,10 +1,10 @@
 #I __SOURCE_DIRECTORY__
 #I "./bin/Debug"
 #r "Suave.dll"
+#r "HtmlConsole.dll"
 
-#load "Library.fs"
+open HtmlConsole
 
-HtmlConsole.WriteHtml "<H1>Hello, World</H1>"
-HtmlConsole.WriteHtml "1<2 is true."
-HtmlConsole.Open()
+WriteHtml "<H1>Hello, World</H1>"
+WriteHtml "1<2 is true."
 
