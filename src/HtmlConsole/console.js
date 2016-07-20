@@ -1,37 +1,33 @@
-﻿function updateConsole() {
-    var body = $("body");
-    var timestamp = parseInt(body.attr("data-console-timestamp"))
-    $.get("updates?t=" + timestamp).done(function (updates) {
-        for (var i = 0; i < updates.length; i++) {
-            var id = updates[i].id;
-            var text = updates[i].text;
-            var div = $("#" + id);
-            if (div.length == 0)
-                body.append($("<div>" + text + "</div>").attr("id", id));
-            else
-                div.html(text);
-            //var xmlDoc = $(xml);
-            //var updates = $.map(xmlDoc.find("updates").find("u"), function (u) {
-            //    var ju = $(u);
-            //    return {
-            //        time: parseInt(ju.attr("time")),
-            //        text: ju.attr("text")
-            //    }
-            //});
-            //for (var i = 0; i < updates.length; i++)
-            //    if (updates[i].time > time) {
-            //        $("body").append($("<div>" + updates[i].text + "</div>"));
-            //        time = updates[i].time;
-            //    }
-        }
-        body.attr("data-console-timestamp", timestamp + updates.length);
-        setTimeout(updateConsole, 1000);
-    }).fail(function (e) {
-        console.log(e);
-        setTimeout(updateConsole, 1000);
-    });
-}
+﻿$(function () {
 
-$(function () {
+    function updateConsole() {
+        var content = $("#html-console-content");
+        var timestamp = parseInt(content.attr("data-timestamp"));
+        $.ajax({
+            url: "updates?t=" + timestamp,
+            cache: false
+        }).done(function (updates) {
+            //window.alert("updates?t=" + timestamp + "; " + updates.length);
+            for (var i = 0; i < updates.length; i++) {
+                var id = updates[i].id;
+                var text = updates[i].text;
+                var div = $("#" + id);
+                if (div.length == 0)
+                    content.append($("<div>" + text + "</div>").attr("id", id));
+                else
+                    div.html(text);
+            }
+            content.attr("data-timestamp", timestamp + updates.length);            
+            window.setTimeout(updateConsole, 1000);
+        }).fail(function (jqXHR, statusText) {
+            if (jqXHR.readyState == 0 && jqXHR.status == 0) {
+                $("#html-console-errorPopup").show();
+            } else {
+                console.log(statusText);            
+                window.setTimeout(updateConsole, 1000);
+            }
+        });
+    }
+
     updateConsole();
 })

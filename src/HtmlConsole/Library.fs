@@ -35,12 +35,13 @@ let encodeJS (s : string) =
     let sb = Text.StringBuilder()
     s |> Seq.iter (fun c -> (match c with
                              | '\"' -> sb.Append("\\\"")
-                             | '\'' -> sb.Append("\\\'")
                              | '\\' -> sb.Append("\\\\")
                              | '\f' -> sb.Append("\\f")
                              | '\n' -> sb.Append("\\n")
                              | '\r' -> sb.Append("\\r")
-                             | '\t' -> sb.Append("\\t");
+                             | '\t' -> sb.Append("\\t")
+                             | '\v' -> sb.Append("\\v")
+                             | '\b' -> sb.Append("\\b")
                              | c -> let code = int c 
                                     if code < 32 || code > 127 then sb.AppendFormat("\\u{0:X04}", code) else sb.Append(c)) |> ignore)
     sb.ToString()

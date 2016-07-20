@@ -66,6 +66,7 @@
     <Content Include="App.config" />
     <EmbeddedResource Include="console.js" />
     <EmbeddedResource Include="console.html" />
+    <None Include="ChartsAndTables.fsx" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
